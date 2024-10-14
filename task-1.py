@@ -1,13 +1,16 @@
+import math
+import random
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 from Crypto.Util.Padding import pad,unpad
 from hashlib import sha256
 
-def generate_public_number():
-    return None
 
-def compute_private_key():
-    return None
+def generate_public_number():
+    return random.randint(0, int(math.pow(2, 32)))
+
+def generate_private_key(public_A, public_B, private_number):
+    return math.pow(public_A, private_number) % public_B
 
 def compute_shared_secret(Y, x, q):
     """Takes in a computed private key, a random element, and a public key and computes the shared secret."""
