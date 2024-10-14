@@ -1,8 +1,11 @@
-def generate_private_key():
-    return None
+import math
+import random
 
-def compute_public_key():
-    return None
+def generate_public_number():
+    return random.randint(0, int(math.pow(2, 32)))
+
+def generate_private_key(public_A, public_B, private_number):
+    return math.pow(public_A, private_number) % public_B
 
 def compute_shared_secret():
     return None
