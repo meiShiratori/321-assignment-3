@@ -9,17 +9,17 @@ from hashlib import sha256
 def generate_public_number():
     return random.randint(0, int(math.pow(2, 32)))
 
-def generate_private_key(public_A, public_B, private_number):
-    return math.pow(public_A, private_number) % public_B
+def generate_private_key(q, a, X):
+    return math.pow(a, X) % q
 
-def compute_shared_secret(Y, x, q):
+def compute_shared_secret(Y, X, q):
     """Takes in a computed private key, a random element, and a public key and computes the shared secret."""
-    return (Y ** x) % q
+    return (Y ** X) % q
     
 
 def derive_key(s):
     """Takes in a shared secret and returns the symmetric key."""
-    return sha256(bytes(s)).digest()
+    return sha256(bytes(s)).digest()[:16]
 
 def encrypt_message(message, aes_key, iv):
     data_bytes = message.encode('utf-8')
@@ -59,20 +59,43 @@ def decrypt_message(blocks, aes_key):
     return decrypted_message
 
 def diffie_hellman_protocol():
-    return None
+    q = 5
+    a = 37
+    print(f"Public Keys: q = {q}, a = {a}\n")
+    
+    Xa = 4
+    Xb = 3
+    print(f"Alice selected random element a = {Xa}")
+    print(f"Bob selected a random element b = {Xb}\n")
+
+    Ya = generate_private_key(q, a, Xa)
+    Yb = generate_private_key(q, a, Xb)
+    print(f"Alice computes private key Ya = {Ya}")
+    print(f"Bob computes private key Yb = {Yb}\n")
+    print()
+
+    Sa = compute_shared_secret(Yb, Xa, q)
+    Sb = compute_shared_secret(Ya, Xb, q)
+    print(f"Alice computes shared secret Sa = {Sa}")
+    print(f"Bob computes shared secret Sb  = {Sb}")
+    print(f"Shared secret is the same:  {Sa == Sb}\n")
+
+    
+    symmetric_key_a = derive_key(int(Sa))
+    symmetric_key_b = derive_key(int(Sb))
+    print(f"Alice derives symmetric key k = {symmetric_key_a}")
+    print(f"Bob derives symmetric key k = {symmetric_key_b}")
+    
+    #print(f"Shared secret is the same:  {Sa == Sb}\n")
+
+    iv = get_random_bytes(16)
+
+    
+    
 
 if __name__ == "__main__":
-    print(compute_shared_secret(1, 2, 3))
-    symmetric_key = derive_key(1)
-    print(symmetric_key)
-
-    message = f"hello world"
+    diffie_hellman_protocol()
     
-    encrypted = encrypt_message(message, symmetric_key, get_random_bytes(16))
-    print(encrypted)
-    decrypted = decrypt_message(encrypted, symmetric_key)
-    print(decrypted)
-    #print(b''.join(decrypted).decode('utf-8'))
 
 
     
