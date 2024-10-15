@@ -1,3 +1,4 @@
+
 import math
 import random
 from Crypto.Cipher import AES
@@ -56,8 +57,10 @@ def decrypt_message(encrypted, aes_key):
     return decrypted_message
 
 def diffie_hellman_protocol():
-    q = 5
-    a = 37
+    hex_string1 = "B10B8F96A"
+    hex_string2 = "A4D1CBD5"
+    q = int(hex_string1, 16)
+    a = int(hex_string2, 16)
     print(f"Public Keys: q = {q}, a = {a}\n")
     
     Xa = 4
