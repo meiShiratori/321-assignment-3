@@ -58,10 +58,14 @@ def decrypt_message(encrypted, aes_key):
 def diffie_hellman_protocol():
     q = 5
     a = 37
-    print(f"Public Keys: q = {q}, a = {a}\n")
+    print(f"Public Keys: q = {q}, a = {a}")
+    a = 1
+    print(f"Mallory tampers the generator and sets a = {1}")
+
     
-    Xa = 4
-    Xb = 3
+    
+    Xa = 41
+    Xb = 23
     print(f"Alice selected random element a = {Xa}")
     print(f"Bob selected a random element b = {Xb}\n")
 
@@ -69,32 +73,36 @@ def diffie_hellman_protocol():
     Yb = generate_private_key(q, a, Xb)
     print(f"Alice computes private key Ya = {Ya}")
     print(f"Bob computes private key Yb = {Yb}\n")
-    print()
 
     Sa = compute_shared_secret(Yb, Xa, q)
     Sb = compute_shared_secret(Ya, Xb, q)
-    print(f"Alice computes shared secret Sa = {Sa}")
-    print(f"Bob computes shared secret Sb  = {Sb}")
-    print(f"Shared secret is the same:  {Sa == Sb}\n")
+    Sm = 1 # Any number 1 to the power of anything is 1. The shared secret will always be 1.
+    print(f"Shared secret is the same for Alice & Bob:  {Sa == Sb}")
+    print(f"The shared secret between Alice and Bob is computes shared secret S = {Sa}")
+    print(f"Mallory knows the shared secret Sm = {Sa}\n")
+
+
+
 
     
     symmetric_key_a = derive_key(int(Sa))
     symmetric_key_b = derive_key(int(Sb))
-    print(f"Alice derives symmetric key k = {symmetric_key_a}")
-    print(f"Bob derives symmetric key k = {symmetric_key_b}\n")
+    symmetric_key_m = derive_key(int(Sm))
+    print(f"Alice derives symmetric key Ka = {symmetric_key_a}")
+    print(f"Bob derives symmetric key Kb = {symmetric_key_b}")
+    print(f"Mallory derives symmetric key Km = {symmetric_key_m}\n")
     
-    #print(f"Shared secret is the same:  {Sa == Sb}\n")
-
     # Alice -> Bob
     message = "Hi Bob!"
     print(f"Alice sends the message: {message}")
     iv = get_random_bytes(16)
     encrypted_message = encrypt_message(message, symmetric_key_a, iv)
 
-    print("Bob receieves the encrypted message: ", encrypted_message)
+    print("Bob and Mallory receieves the encrypted message: ", encrypted_message)
     decrypted_message = decrypt_message(encrypted_message, symmetric_key_b)
-    print(f"Bob decrypts the message: {decrypted_message}\n")
-
+    print(f"Bob decrypts the message: {decrypted_message}")
+    mallory_message = decrypt_message(encrypted_message, symmetric_key_m)
+    print(f"Mallory decrypts the message: {mallory_message}\n")
 
     # Bob -> Alice
     message = "Hi Alice!"
@@ -102,10 +110,11 @@ def diffie_hellman_protocol():
     iv = get_random_bytes(16)
     encrypted_message = encrypt_message(message, symmetric_key_a, iv)
 
-    print("Alice receieves the encrypted message: ", encrypted_message)
+    print("Alice and Mallory receieves the encrypted message: ", encrypted_message)
     decrypted_message = decrypt_message(encrypted_message, symmetric_key_b)
-    print(f"Alice decrypts the message: {decrypted_message}\n")
-
+    print(f"Alice decrypts the message: {decrypted_message}")
+    mallory_message = decrypt_message(encrypted_message, symmetric_key_m)
+    print(f"Mallory decrypts the message: {mallory_message}\n")
     
     
 
