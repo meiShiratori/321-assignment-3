@@ -15,7 +15,6 @@ def generate_private_key(q, a, X):
 def compute_shared_secret(Y, X, q):
     """Takes in a computed private key, a random element, and a public key and computes the shared secret."""
     return (Y ** X) % q
-    
 
 def derive_key(s):
     """Takes in a shared secret and returns the symmetric key."""
@@ -37,9 +36,9 @@ def encrypt_message(message, aes_key, iv):
         encrypted_blocks.append(enc_block)
         previous_block = enc_block
 
-    return  b''.join(encrypted_blocks)
+    return  iv + b''.join(encrypted_blocks)
 
-def decrypt_message(blocks, aes_key):
+def decrypt_message(encrypted, aes_key):
     iv = encrypted[:16]
     encrypted_blocks = [encrypted[i:i + 16] for i in range(16, len(encrypted), 16)]
 
@@ -50,12 +49,10 @@ def decrypt_message(blocks, aes_key):
     for block in encrypted_blocks:
         dec_block = cipher.decrypt(block)
         xor_block = bytes(a ^ b for a, b in zip(dec_block, previous_block))
-        decrypted_blocks.append(xor_block)
+        decrypted_blocks.append(unpad(xor_block, 16))
         previous_block = block
 
     decrypted_message = b''.join(decrypted_blocks).decode('utf-8')
-    decrypted_message = decrypted_message.replace('%3B', ';').replace('%3D', '=')
-
     return decrypted_message
 
 def diffie_hellman_protocol():
@@ -88,13 +85,18 @@ def diffie_hellman_protocol():
     
     #print(f"Shared secret is the same:  {Sa == Sb}\n")
 
+    message = "some test data"
     iv = get_random_bytes(16)
-
+    encrypted_message = encrypt_message(message, symmetric_key_a, iv)
+    print("encrypted_message: ", encrypted_message)
+    decrypted_message = decrypt_message(encrypted_message, symmetric_key_b)
+    print("decrypted message: " + decrypted_message)
     
     
 
 if __name__ == "__main__":
-    diffie_hellman_protocol()
+     diffie_hellman_protocol()
+
     
 
 
